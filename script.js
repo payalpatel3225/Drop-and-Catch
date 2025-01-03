@@ -14,7 +14,7 @@ const gameSound = document.getElementById("game-sound"); // Single audio element
 let score = 0;
 let lives = 3;
 let gameActive = false;
-let basketLeft = 50;
+let basketLeft = 50; // Start at center (50% left of the screen)
 let fallingSpeed = 5;
 
 // Function to get a random color
@@ -30,14 +30,44 @@ function resetFallingObject() {
     fallingObject.style.backgroundColor = getRandomColor();  // Assign random color
 }
 
+// Track touch events on mobile devices
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchmove", (e) => {
+    touchEndX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", () => {
+    if (!gameActive) return;
+
+    const moveThreshold = 20; // Minimum movement threshold to consider direction
+
+    if (touchStartX - touchEndX > moveThreshold) {
+        basketLeft = Math.max(0, basketLeft - 5); // Move left
+    } else if (touchEndX - touchStartX > moveThreshold) {
+        basketLeft = Math.min(100, basketLeft + 5); // Move right
+    }
+
+    // Update basket position to maintain equal movement range on both sides
+    basket.style.left = basketLeft + "%";
+});
+
 document.addEventListener("keydown", (e) => {
     if (!gameActive) return;
 
+    const moveAmount = 5; // Define the movement step amount
     if (e.key === "ArrowLeft") {
-        basketLeft = Math.max(0, basketLeft - 5);
+        basketLeft = Math.max(0, basketLeft - moveAmount); // Move left
     } else if (e.key === "ArrowRight") {
-        basketLeft = Math.min(90, basketLeft + 5);
+        basketLeft = Math.min(100, basketLeft + moveAmount); // Move right
     }
+
+    // Update basket position
     basket.style.left = basketLeft + "%";
 });
 
