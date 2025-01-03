@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drop and Catch</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 id="game-title">Drop and Catch</h1>
+    
+    <!-- Single audio element for ringtone -->
+    <audio id="game-sound" src="Audio/game-sound.mp3"></audio>
+    
+    <div id="start-screen">
+        <button id="start-btn">Start Game</button>
+    </div>
+    
+    <div id="game-container" style="display: none;">
+        <div id="basket"></div>
+        <div id="falling-object"></div>
+        <p id="score">Score: 0</p>
+        <p id="lives">Lives: 3</p>
+    </div>
+    
+    <div id="game-over-screen" style="display: none;">
+        <p id="game-over">Game Over!</p>
+        <button id="restart-btn">Play Again</button>
+        <button id="home-btn">Back to Home</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
