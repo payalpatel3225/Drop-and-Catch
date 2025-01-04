@@ -8,9 +8,6 @@ const livesDisplay = document.getElementById("lives");
 const gameOverScreen = document.getElementById("game-over-screen");
 const restartBtn = document.getElementById("restart-btn");
 const homeBtn = document.getElementById("home-btn");
-const leftBtn = document.getElementById("left-btn");
-const rightBtn = document.getElementById("right-btn");
-const mobileControls = document.getElementById("mobile-controls");
 
 const gameSound = document.getElementById("game-sound");
 
@@ -18,7 +15,8 @@ let score = 0;
 let lives = 3;
 let gameActive = false;
 let basketLeft = 50;
-let fallingSpeed = 5;
+let basketMoveSpeed = 10; // Basket movement speed reduced for slower motion
+let fallingSpeed = 5; // Falling speed remains unchanged
 
 // Function to get a random color
 function getRandomColor() {
@@ -33,7 +31,7 @@ function resetFallingObject() {
     fallingObject.style.backgroundColor = getRandomColor();
 }
 
-// Show mobile controls only after the game starts
+// Start the game
 startBtn.addEventListener("click", () => {
     startScreen.style.display = "none";
     gameContainer.style.display = "block";
@@ -47,45 +45,44 @@ startBtn.addEventListener("click", () => {
     resetFallingObject();
     animateFallingObject();
     gameSound.play();
-
-    // Show mobile controls after game starts
-    if (window.innerWidth <= 600) {
-        mobileControls.style.display = "flex";
-    }
 });
 
-// Handle the resizing of the screen
+// Handle basket click for mobile screens
+function enableBasketClick() {
+    basket.addEventListener("click", (e) => {
+        if (!gameActive || window.innerWidth > 600) return;
+
+        const clickX = e.clientX;
+        const basketRect = basket.getBoundingClientRect();
+        const basketCenter = basketRect.left + basketRect.width / 2;
+
+        if (clickX < basketCenter) {
+            basketLeft = Math.max(0, basketLeft - basketMoveSpeed); // Move left slowly
+        } else {
+            basketLeft = Math.min(100, basketLeft + basketMoveSpeed); // Move right slowly
+        }
+
+        basket.style.left = basketLeft + "%";
+    });
+}
+
+// Enable basket click for mobile screens only
 function checkScreenSize() {
-    if (window.innerWidth <= 600 && gameActive) {
-        mobileControls.style.display = "flex";
-    } else {
-        mobileControls.style.display = "none";
+    if (window.innerWidth <= 600) {
+        enableBasketClick();
     }
 }
 checkScreenSize();
 window.addEventListener("resize", checkScreenSize);
 
-// Add event listeners for mobile buttons
-leftBtn.addEventListener("click", () => {
-    if (!gameActive) return;
-    basketLeft = Math.max(0, basketLeft - 5);
-    basket.style.left = basketLeft + "%";
-});
-
-rightBtn.addEventListener("click", () => {
-    if (!gameActive) return;
-    basketLeft = Math.min(100, basketLeft + 5);
-    basket.style.left = basketLeft + "%";
-});
-
+// Add keyboard controls for desktop
 document.addEventListener("keydown", (e) => {
     if (!gameActive) return;
 
-    const moveAmount = 5;
     if (e.key === "ArrowLeft") {
-        basketLeft = Math.max(0, basketLeft - moveAmount);
+        basketLeft = Math.max(0, basketLeft - basketMoveSpeed); // Move left slowly
     } else if (e.key === "ArrowRight") {
-        basketLeft = Math.min(100, basketLeft + moveAmount);
+        basketLeft = Math.min(100, basketLeft + basketMoveSpeed); // Move right slowly
     }
 
     basket.style.left = basketLeft + "%";
