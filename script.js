@@ -8,13 +8,16 @@ const livesDisplay = document.getElementById("lives");
 const gameOverScreen = document.getElementById("game-over-screen");
 const restartBtn = document.getElementById("restart-btn");
 const homeBtn = document.getElementById("home-btn");
+const leftBtn = document.getElementById("left-btn");
+const rightBtn = document.getElementById("right-btn");
+const mobileControls = document.getElementById("mobile-controls");
 
-const gameSound = document.getElementById("game-sound"); // Single audio element for the ringtone
+const gameSound = document.getElementById("game-sound");
 
 let score = 0;
 let lives = 3;
 let gameActive = false;
-let basketLeft = 50; // Start at center (50% left of the screen)
+let basketLeft = 50;
 let fallingSpeed = 5;
 
 // Function to get a random color
@@ -26,48 +29,65 @@ function getRandomColor() {
 // Function to reset the falling object
 function resetFallingObject() {
     fallingObject.style.top = "0px";
-    fallingObject.style.left = Math.random() * 90 + "%";  // Randomize horizontal position
-    fallingObject.style.backgroundColor = getRandomColor();  // Assign random color
+    fallingObject.style.left = Math.random() * 90 + "%";
+    fallingObject.style.backgroundColor = getRandomColor();
 }
 
-// Track touch events on mobile devices
-let touchStartX = 0;
-let touchEndX = 0;
+// Show mobile controls only after the game starts
+startBtn.addEventListener("click", () => {
+    startScreen.style.display = "none";
+    gameContainer.style.display = "block";
+    scoreDisplay.style.display = "block";
+    livesDisplay.style.display = "block";
+    gameActive = true;
+    score = 0;
+    lives = 3;
+    scoreDisplay.textContent = `Score: ${score}`;
+    livesDisplay.textContent = `Lives: ${lives}`;
+    resetFallingObject();
+    animateFallingObject();
+    gameSound.play();
 
-document.addEventListener("touchstart", (e) => {
-    touchStartX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchmove", (e) => {
-    touchEndX = e.touches[0].clientX;
-});
-
-document.addEventListener("touchend", () => {
-    if (!gameActive) return;
-
-    const moveThreshold = 20; // Minimum movement threshold to consider direction
-
-    if (touchStartX - touchEndX > moveThreshold) {
-        basketLeft = Math.max(0, basketLeft - 5); // Move left
-    } else if (touchEndX - touchStartX > moveThreshold) {
-        basketLeft = Math.min(100, basketLeft + 5); // Move right
+    // Show mobile controls after game starts
+    if (window.innerWidth <= 600) {
+        mobileControls.style.display = "flex";
     }
+});
 
-    // Update basket position to maintain equal movement range on both sides
+// Handle the resizing of the screen
+function checkScreenSize() {
+    if (window.innerWidth <= 600 && gameActive) {
+        mobileControls.style.display = "flex";
+    } else {
+        mobileControls.style.display = "none";
+    }
+}
+checkScreenSize();
+window.addEventListener("resize", checkScreenSize);
+
+// Add event listeners for mobile buttons
+leftBtn.addEventListener("click", () => {
+    if (!gameActive) return;
+    basketLeft = Math.max(0, basketLeft - 5);
+    basket.style.left = basketLeft + "%";
+});
+
+rightBtn.addEventListener("click", () => {
+    if (!gameActive) return;
+    basketLeft = Math.min(100, basketLeft + 5);
     basket.style.left = basketLeft + "%";
 });
 
 document.addEventListener("keydown", (e) => {
     if (!gameActive) return;
 
-    const moveAmount = 5; // Define the movement step amount
+    const moveAmount = 5;
     if (e.key === "ArrowLeft") {
-        basketLeft = Math.max(0, basketLeft - moveAmount); // Move left
+        basketLeft = Math.max(0, basketLeft - moveAmount);
     } else if (e.key === "ArrowRight") {
-        basketLeft = Math.min(100, basketLeft + moveAmount); // Move right
+        basketLeft = Math.min(100, basketLeft + moveAmount);
     }
 
-    // Update basket position
     basket.style.left = basketLeft + "%";
 });
 
@@ -83,12 +103,12 @@ function checkCollision() {
         score++;
         scoreDisplay.textContent = `Score: ${score}`;
         resetFallingObject();
-        gameSound.play(); // Play sound when the object is caught
+        gameSound.play();
     } else if (parseInt(fallingObject.style.top) > 500) {
         lives--;
         livesDisplay.textContent = `Lives: ${lives}`;
         resetFallingObject();
-        gameSound.play(); // Play sound when the player loses a life
+        gameSound.play();
 
         if (lives <= 0) {
             gameOver();
@@ -105,21 +125,6 @@ function animateFallingObject() {
     checkCollision();
     requestAnimationFrame(animateFallingObject);
 }
-
-startBtn.addEventListener("click", () => {
-    startScreen.style.display = "none";
-    gameContainer.style.display = "block";
-    scoreDisplay.style.display = "block";
-    livesDisplay.style.display = "block";
-    gameActive = true;
-    score = 0;
-    lives = 3;
-    scoreDisplay.textContent = `Score: ${score}`;
-    livesDisplay.textContent = `Lives: ${lives}`;
-    resetFallingObject();
-    animateFallingObject();
-    gameSound.play(); // Play sound when the game starts
-});
 
 function gameOver() {
     gameActive = false;
