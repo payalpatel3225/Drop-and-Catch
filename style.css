@@ -123,30 +123,6 @@ body {
     background-color: #218838;
 }
 
-#mobile-controls {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    display: none;
-}
-
-#left-btn, #right-btn {
-    padding: 15px 20px;
-    font-size: 1.5em;
-    background-color: #007bff;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-#left-btn:hover, #right-btn:hover {
-    background-color: #0056b3;
-}
-
 @media (max-width: 600px) {
     #game-title {
         font-size: 2.5em;
